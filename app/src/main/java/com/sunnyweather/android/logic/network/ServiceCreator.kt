@@ -16,4 +16,8 @@ object ServiceCreator {
 
     inline fun <reified T> create(): T = create(T::class.java)
 
+    val placeService: PlaceService by lazy {
+        create(PlaceService::class.java)
+    }
+
 }
