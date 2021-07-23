@@ -37,6 +37,8 @@ class WeatherActivity : AppCompatActivity() {
     private lateinit var forecastLayout: LinearLayout
     private lateinit var weatherLayout: ScrollView
     private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var navBtn: Button
+     lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +61,8 @@ class WeatherActivity : AppCompatActivity() {
         forecastLayout = findViewById(R.id.forecastLayout)
         weatherLayout = findViewById(R.id.weatherLayout)
         swipeRefresh = findViewById(R.id.swipeRefresh)
+        navBtn = findViewById(R.id.navBtn)
+        drawerLayout = findViewById(R.id.drawerLayout)
 
         if (viewModel.locationLng.isEmpty()) {
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
@@ -96,9 +100,27 @@ class WeatherActivity : AppCompatActivity() {
         swipeRefresh.setOnRefreshListener {
             refreshWeather()
         }
+
+        navBtn.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerStateChanged(newState: Int) {}
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+
+            override fun onDrawerOpened(drawerView: View) {}
+
+            override fun onDrawerClosed(drawerView: View) {
+                val manager = getSystemService(Context.INPUT_METHOD_SERVICE)
+                        as InputMethodManager
+                manager.hideSoftInputFromWindow(drawerView.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+        })
     }
 
-    private fun refreshWeather() {
+    fun refreshWeather() {
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
         swipeRefresh.isRefreshing = true
     }

@@ -32,16 +32,26 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
         holder.placeAddress.text = place.address
 
         holder.itemView.setOnClickListener {
-            val position: Int = holder.absoluteAdapterPosition
-            val place: Place = placeList[position]
-            val intent = Intent(fragment.context, WeatherActivity::class.java).apply {
-                putExtra("location_lng", place.location.lng)
-                putExtra("location_lat", place.location.lat)
-                putExtra("place_name", place.name)
+            val position = holder.adapterPosition
+            val place = placeList[position]
+            val activity = fragment.activity
+            if (activity is WeatherActivity) {
+                activity.drawerLayout.closeDrawers()
+                activity.viewModel.locationLng = place.location.lng
+                activity.viewModel.locationLat = place.location.lat
+                activity.viewModel.placeName = place.name
+                activity.refreshWeather()
+            } else {
+                val intent = Intent(fragment.activity, WeatherActivity::class.java).
+                apply {
+                    putExtra("location_lng", place.location.lng)
+                    putExtra("location_lat", place.location.lat)
+                    putExtra("place_name", place.name)
+                }
+                fragment.startActivity(intent)
+                activity?.finish()
             }
             fragment.viewModel.savePlace(place)
-            fragment.startActivity(intent)
-            fragment.activity?.finish()
         }
     }
 
