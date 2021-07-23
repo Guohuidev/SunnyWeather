@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.sunnyweather.android.R
 import com.sunnyweather.android.logic.model.Weather
 import com.sunnyweather.android.logic.model.getSky
@@ -35,6 +36,7 @@ class WeatherActivity : AppCompatActivity() {
     private lateinit var nowLayout: RelativeLayout
     private lateinit var forecastLayout: LinearLayout
     private lateinit var weatherLayout: ScrollView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +58,7 @@ class WeatherActivity : AppCompatActivity() {
         nowLayout = findViewById(R.id.nowLayout)
         forecastLayout = findViewById(R.id.forecastLayout)
         weatherLayout = findViewById(R.id.weatherLayout)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
 
         if (viewModel.locationLng.isEmpty()) {
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
@@ -77,6 +80,27 @@ class WeatherActivity : AppCompatActivity() {
             }
         })
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
+
+        viewModel.weatherLiveData.observe(this, Observer { result ->
+            val weather = result.getOrNull()
+            if (weather != null) {
+                showWeatherInfo(weather)
+            } else {
+                Toast.makeText(this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show()
+                result.exceptionOrNull()?.printStackTrace()
+            }
+            swipeRefresh.isRefreshing = false
+        })
+        swipeRefresh.setColorSchemeResources(R.color.purple_500)
+        refreshWeather()
+        swipeRefresh.setOnRefreshListener {
+            refreshWeather()
+        }
+    }
+
+    private fun refreshWeather() {
+        viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
+        swipeRefresh.isRefreshing = true
     }
 
     private fun showWeatherInfo(weather: Weather) {
