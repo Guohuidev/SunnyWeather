@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.sunnyweather.android.MainActivity
 import com.sunnyweather.android.R
 import com.sunnyweather.android.ui.weather.WeatherActivity
 
