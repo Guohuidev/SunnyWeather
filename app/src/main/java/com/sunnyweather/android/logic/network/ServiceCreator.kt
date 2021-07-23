@@ -20,4 +20,8 @@ object ServiceCreator {
         create(PlaceService::class.java)
     }
 
+    val weatherService: WeatherService by lazy {
+        create(WeatherService::class.java)
+    }
+
 }
